@@ -25,11 +25,12 @@ function network() {
   }
   return {Peer,peers,packets};
 }
-function page(net, fragment='') {
+function page(net, fragment='', teamsContext=null) {
   const dom = new JSDOM(html,{url:'https://example.test/'+fragment,runScripts:'outside-only',pretendToBeVisual:true});
   const w=dom.window;Object.assign(w,model);w.Peer=net.Peer;w.scrollTo=()=>{};
   w.HTMLDialogElement.prototype.showModal=function(){this.open=true;};w.HTMLDialogElement.prototype.close=function(){this.open=false;};
   const $=id=>w.document.getElementById(id);
+  if (teamsContext) { Object.defineProperty(w,'parent',{value:{}}); w.microsoftTeams={app:{initialize:async()=>{},getContext:async()=>teamsContext,notifySuccess(){}}}; }
   w.eval(source);
   return {dom,w,$,submit(id){$(id).dispatchEvent(new w.Event('submit',{bubbles:true,cancelable:true}));},click(id){$(id).click();},vote(value){w.document.querySelector(`[data-vote="${value}"]`).click();},close(){w.close();}};
 }
@@ -73,7 +74,7 @@ test('spectator status, vote withdrawal, timer and reconnect keep UI and session
 });
 
 test('missing rooms and malformed codes show useful errors and re-enable entry controls', async t=>{
-  const net=network(),p=page(net);t.after(()=>p.close());p.$('name').value='Collega';p.click('join-tab');p.$('room-code').value='bad';p.submit('entry-form');
+  const net=network(),p=page(net);t.after(()=>p.close());p.$('name').value='Collega';p.click('join-tab');p.$('room-code').value='bad';p.submit('entry-form');await settle();
   assert.match(p.$('connection-message').textContent,/12-character/);
   p.$('room-code').value='123456-ABCDEF';p.submit('entry-form');await settle();
   assert.match(p.$('connection-message').textContent,/not active/);assert.equal(p.$('join-room').disabled,false);assert.equal(p.$('room').hidden,true);
@@ -124,3 +125,18 @@ test('Teams configuration sets a shared room and requires nonempty tab name', as
  assert.match(h.$('timer').textContent,/2:00|1:59/);assert.match(h.$('next-round').textContent,/Restart round/);assert.equal(g.$('next-round').hidden,true);
  h.click('next-round');await settle();assert.match(g.$('vote-progress').textContent,/0 of 2/);assert.equal(g.$('story-display').textContent,'Keep this story');assert.match(g.$('timer').textContent,/2:00|1:59/);
  });
+
+test('Teams Start needs no name or room entry and shows a shared countdown', async t=>{
+ const net=network(),fragment='#room=ABCDEF123456&auto=1';
+ const h=page(net,fragment,{user:{displayName:'Annemiek'},channel:{id:'channel-a'}}),g=page(net,fragment,{user:{displayName:'Sam'},channel:{id:'channel-a'}});t.after(()=>{h.close();g.close();});
+ await settle();assert.equal(h.$('name-options').hidden,true);assert.equal(h.$('join-panel').hidden,true);assert.equal(h.$('create-room').textContent,'Start');assert.equal(h.$('room-code').required,false);
+ h.click('create-room');await settle();g.click('create-room');await settle();
+ assert.equal(h.$('room').hidden,false);assert.equal(g.$('room').hidden,false);assert.match(h.$('main-timer').textContent,/2:00|1:59/);
+ assert.equal(h.$('main-timer').textContent,g.$('main-timer').textContent);assert.equal(h.$('room-code-box').hidden,true);assert.equal(h.$('copy-link').hidden,true);assert.match(h.$('member-list').textContent,/Annemiek/);assert.match(h.$('member-list').textContent,/Sam/);
+ assert.match(h.w.location.hash,/auto=1/);
+ h.click('leave-room');h.click('leave-confirm');await settle();assert.equal(h.$('create-room').textContent,'Start');assert.match(h.w.location.hash,/auto=1/);
+});
+test('missing Teams display name and standalone Start both work without typing',async t=>{
+ const net=network(),h=page(net);t.after(()=>h.close());h.click('create-room');await settle();assert.equal(h.$('room').hidden,false);assert.match(h.$('member-list').textContent,/Participant/);
+ const g=page(net,'#room=ABCDEFABCDEF&auto=1',{user:{id:'user-without-name'}});t.after(()=>g.close());await settle();g.click('create-room');await settle();assert.equal(g.$('room').hidden,false);assert.match(g.$('member-list').textContent,/Participant/);
+});

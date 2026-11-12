@@ -60,3 +60,7 @@ Eigen broncode: MIT, zie LICENSE. Bibliotheken: zie THIRD_PARTY_NOTICES.txt. `ve
 ## Versie 1.0.1
 
 De volledige app en Teams-configuratie zijn Engels. Bij starten loopt de timer meteen 2 minuten. De sessieleider kan tijdens stemmen **Restart round** kiezen (zelfde onderwerp, lege stemmen, nieuwe timer) en na onthullen **Next round** (nieuw onderwerp, lege stemmen, nieuwe timer). De timer onthult niet automatisch; de sessieleider gebruikt **Reveal cards**.
+
+## Versie 1.0.2
+
+In een geconfigureerd Teams-tabblad: één Start-knop, geen naamformulier of zichtbare kamercode, automatische weergavenaam uit de Teams-context indien beschikbaar en een grote gezamenlijke timer. Als Teams geen naam levert, gebruikt de app een tijdelijke Participant-naam. Het tabblad bewaart dezelfde sessiekoppeling, ook na verlaten of verversen. De app leest niet de volledige kanaalledenlijst; alleen aangesloten deelnemers verschijnen aan tafel. In de losse webversie is een eigen naam optioneel.

@@ -17,7 +17,7 @@ await writeFile('.nojekyll', ''); await writeFile('dist/.nojekyll', '');
 await mkdir('teams', { recursive: true });
 const manifest = {
   $schema: 'https://developer.microsoft.com/en-us/json-schemas/teams/v1.19/MicrosoftTeams.schema.json',
-  manifestVersion: '1.19', version: '1.0.1', id: '0c355514-f609-4c49-8c28-376736180e73',
+  manifestVersion: '1.19', version: '1.0.2', id: '0c355514-f609-4c49-8c28-376736180e73',
   developer: { name: 'Annemiek de Haan', websiteUrl: 'https://github.com/annemiekdehaan/refinement-poker', privacyUrl: base + 'privacy.html', termsOfUseUrl: base + 'privacy.html' },
   name: { short: 'Refinement Poker', full: 'Refinement Poker — estimate together' },
   description: { short: 'Estimate stories together with hidden votes and a shared reveal.', full: 'Start a refinement session in your meeting, chat or channel. Everyone chooses a card independently; the facilitator reveals the votes together. Discuss differences, save agreed story points and export results as CSV. No account needed. Up to 12 participants; the facilitator keeps the app open. Requires a network that allows WebRTC.' },

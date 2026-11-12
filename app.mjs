@@ -3,6 +3,7 @@ const $ = id => document.getElementById(id);
 const params = new URLSearchParams(location.hash.slice(1));
 let code = normalizeRoom(params.get('room') || '');
 let mode = validRoom(code) ? 'join' : 'create';
+let sharedSession = params.get('auto') === '1' && validRoom(code);
 let peer, upstream, room, view, owner = false, connected = false, busy = false, lastHost = 0, connectTimeout;
 const connections = new Map();
 const profile = readSession('rp-profile') || { id: uuid(), token: uuid(), name: '' };
@@ -20,7 +21,7 @@ function toast(value) { clearTimeout(toastTimeout); text('toast', value); show('
 function selectMode(value) { mode = value; ['create', 'join'].forEach(type => { $(`${type}-tab`).setAttribute('aria-selected', String(value === type)); show(`${type}-panel`, value === type); }); $('room-code').required = value === 'join'; }
 function busyState(value) { busy = value; ['create-room', 'join-room', 'resume-room'].forEach(id => $(id).disabled = value); }
 function link() { return `${location.origin}${location.pathname}#room=${view.code}`; }
-function setUrl(roomCode) { code = roomCode; history.replaceState(null, '', `#room=${roomCode}`); }
+function setUrl(roomCode) { code = roomCode; history.replaceState(null, '', `#room=${roomCode}${sharedSession ? '&auto=1' : ''}`); }
 function setConnected(value, label = value ? 'Connected' : 'Disconnected') { connected = value; text('network-status', label); $('network-status').classList.toggle('offline', !value); if (view) render(); }
 function stopTransport() { clearTimeout(connectTimeout); connections.clear(); upstream = null; if (peer) { const old = peer; peer = null; old.destroy(); } connected = false; }
 function failed(value) { stopTransport(); busyState(false); message(value, true); if (view) { setConnected(false); toast(value); } }
@@ -181,6 +182,7 @@ function render() {
     row.append(avatar, name, node('span', 'member-status', member.spectator ? '◉' : member.hasVoted ? '✓' : '···')); return row;
   }));
   text('copy-code', roomLabel(view.code));
+  show('room-code-box', !sharedSession); show('copy-link', !sharedSession);
   show('results', revealed);
   if (revealed) renderResults();
   $('history').replaceChildren(...view.history.map(item => { const row = node('div', 'history-item'); const info = node('div', '', item.title); info.append(node('small', '', `Round ${item.round} · ${item.votes.length} votes`)); row.append(info, node('strong', 'estimate-pill', item.estimate)); return row; }));
@@ -204,6 +206,9 @@ function updateTimer() {
   if (!view) return;
   const seconds = view.endsAt ? Math.max(0, Math.ceil((view.endsAt - Date.now()) / 1000)) : null;
   text('timer', seconds === null ? '◷ No timer' : seconds === 0 ? '◷ Time to discuss' : `◷ ${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`);
+  text('main-timer', seconds === null ? '—:—' : `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`);
+  text('timer-caption', view.revealed ? 'Cards revealed · ready for the next round' : seconds === 0 ? 'Time to discuss · the facilitator reveals the cards' : seconds === null ? 'Timer stopped' : `Round ${view.round} · choose your card`);
+  $('main-timer').classList.toggle('expired', seconds === 0);
   $('timer').classList.toggle('expired', seconds === 0);
   text('timer-start', view.endsAt ? 'Stop timer' : 'Start timer');
   $('timer-start').disabled = !connected;
@@ -217,16 +222,22 @@ for (const value of DECK) {
   const option = node('option', '', value); option.value = value; $('final-estimate').append(option);
 }
 $('create-tab').onclick = () => selectMode('create'); $('join-tab').onclick = () => selectMode('join');
-$('entry-form').onsubmit = event => {
+$('entry-form').onsubmit = async event => {
   event.preventDefault(); if (busy) return;
-  profile.name = cleanText($('name').value, 30); if (!profile.name) { $('name').focus(); return; }
+  busyState(true);
+  await teamsReady;
+  profile.name = cleanText($('name').value, 30) || profile.name || `Participant ${profile.id.slice(0, 4)}`;
   saveSession('rp-profile', profile);
-  if (mode === 'create') startHost();
+  if (sharedSession) {
+    if (hostSnapshot?.profileId === profile.id && hostSnapshot.room?.code === code) startHost(code, hostSnapshot.room);
+    else startGuest(code, true);
+  }
+  else if (mode === 'create') startHost();
   else {
     let input = $('room-code').value.trim();
     try { if (input.includes('://')) input = new URLSearchParams(new URL(input).hash.slice(1)).get('room') || ''; } catch {}
     const roomCode = normalizeRoom(input);
-    if (!validRoom(roomCode)) { message('Enter the 12-character room code, for example ABC123-DEF456.', true); return; }
+    if (!validRoom(roomCode)) { busyState(false); message('Enter the 12-character room code, for example ABC123-DEF456.', true); return; }
     startGuest(roomCode, params.get('auto') === '1' && roomCode === code);
   }
 };
@@ -247,7 +258,7 @@ $('export-csv').onclick = () => {
 $('help-open').onclick = () => $('help').showModal(); $('help-close').onclick = () => $('help').close();
 $('leave-room').onclick = () => { text('leave-copy', owner ? 'If you leave, the session ends for everyone. Export your saved results as CSV first.' : 'You can rejoin using the same link while the facilitator keeps the table open.'); $('leave-dialog').showModal(); };
 $('leave-cancel').onclick = () => $('leave-dialog').close();
-$('leave-confirm').onclick = () => { $('leave-dialog').close(); stopTransport(); removeSession('rp-host'); hostSnapshot = null; view = room = null; owner = false; history.replaceState(null, '', location.pathname); code = ''; busyState(false); message('You have left the session.'); show('room', false); show('lobby', true); show('resume-room', false); selectMode('create'); };
+$('leave-confirm').onclick = () => { $('leave-dialog').close(); stopTransport(); removeSession('rp-host'); hostSnapshot = null; view = room = null; owner = false; if (!sharedSession) { history.replaceState(null, '', location.pathname); code = ''; } busyState(false); message('You have left the session.'); show('room', false); show('lobby', true); show('resume-room', false); selectMode(sharedSession ? 'join' : 'create'); configureEntry(); };
 window.addEventListener('beforeunload', event => { if (owner && view && connected) { event.preventDefault(); event.returnValue = ''; } });
 window.addEventListener('online', () => { if (peer?.disconnected && !peer.destroyed) peer.reconnect(); });
 setInterval(() => {
@@ -266,9 +277,23 @@ async function initTeams() {
   try {
     await Promise.race([window.microsoftTeams.app.initialize(), new Promise((_, reject) => setTimeout(reject, 5000))]);
     const context = await window.microsoftTeams.app.getContext();
-    if (!$('name').value && context.user?.displayName) $('name').value = cleanText(context.user.displayName, 30);
+    if (context.user?.displayName) { profile.name = cleanText(context.user.displayName, 30); $('name').value = profile.name; saveSession('rp-profile', profile); }
+    configureEntry();
     if (context.app?.theme === 'contrast') document.body.classList.add('high-contrast');
     window.microsoftTeams.app.notifySuccess();
   } catch { /* The app also works in a regular browser or iframe. */ }
 }
-initTeams();
+function configureEntry() {
+  document.body.classList.toggle('shared-session', sharedSession);
+  if (!sharedSession) return;
+  $('name').required = false; $('room-code').required = false;
+  show('name-options', false); show('join-panel', false); show('create-panel', true);
+  $('create-tab').closest('.entry-tabs').hidden = true;
+  text('create-room', 'Start');
+  text('teams-identity', profile.name ? `Joining as ${profile.name}` : 'Your team is ready. Press Start to join.'); show('teams-identity', true);
+  document.querySelector('.entry-card h2').textContent = 'Ready?';
+  document.querySelector('.entry-card > p').textContent = 'Press Start. Everyone in this tab joins the same session.';
+  document.querySelector('.panel-copy').textContent = 'The first person to start leads the session. Your two-minute timer starts immediately.';
+}
+configureEntry();
+const teamsReady = initTeams();
