@@ -1,0 +1,57 @@
+{
+  "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.19/MicrosoftTeams.schema.json",
+  "manifestVersion": "1.19",
+  "version": "1.0.0",
+  "id": "0c355514-f609-4c49-8c28-376736180e73",
+  "developer": {
+    "name": "Annemiek de Haan",
+    "websiteUrl": "https://github.com/annemiekdehaan/refinement-poker",
+    "privacyUrl": "https://annemiekdehaan.github.io/refinement-poker/privacy.html",
+    "termsOfUseUrl": "https://annemiekdehaan.github.io/refinement-poker/privacy.html"
+  },
+  "name": {
+    "short": "Refinement Poker",
+    "full": "Refinement Poker — samen inschatten"
+  },
+  "description": {
+    "short": "Samen stories inschatten met verborgen stemmen en gezamenlijk onthullen.",
+    "full": "Start een refinement-sessie in je vergadering, chat of kanaal. Iedereen kiest onafhankelijk een kaart; de sessieleider onthult de stemmen tegelijk. Bespreek verschillen, bewaar afgesproken story points en exporteer resultaten als CSV. Geen account nodig. Maximaal 12 deelnemers; de sessieleider houdt de app open. Vereist een netwerk dat WebRTC toestaat."
+  },
+  "icons": {
+    "outline": "outline.png",
+    "color": "color.png"
+  },
+  "accentColor": "#203B33",
+  "configurableTabs": [
+    {
+      "configurationUrl": "https://annemiekdehaan.github.io/refinement-poker/config.html",
+      "canUpdateConfiguration": true,
+      "scopes": [
+        "team",
+        "groupChat"
+      ],
+      "context": [
+        "channelTab",
+        "privateChatTab",
+        "meetingChatTab",
+        "meetingDetailsTab",
+        "meetingSidePanel"
+      ]
+    }
+  ],
+  "staticTabs": [
+    {
+      "entityId": "refinement-poker-home",
+      "name": "Poker",
+      "contentUrl": "https://annemiekdehaan.github.io/refinement-poker/",
+      "websiteUrl": "https://annemiekdehaan.github.io/refinement-poker/",
+      "scopes": [
+        "personal"
+      ]
+    }
+  ],
+  "validDomains": [
+    "annemiekdehaan.github.io",
+    "0.peerjs.com"
+  ]
+}

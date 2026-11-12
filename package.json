@@ -1,0 +1,21 @@
+{
+  "name": "refinement-poker",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "npm run build && node --test tests/*.test.mjs",
+    "build": "node scripts/build.mjs",
+    "start": "node scripts/serve.mjs"
+  },
+  "dependencies": {
+    "@microsoft/teams-js": "2.59.0",
+    "peerjs": "1.5.5"
+  },
+  "devDependencies": {
+    "ajv": "^8.20.0",
+    "ajv-draft-04": "^1.0.0",
+    "jsdom": "^31.0.0",
+    "pngjs": "7.0.0"
+  }
+}
