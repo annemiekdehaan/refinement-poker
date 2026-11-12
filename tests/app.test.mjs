@@ -43,7 +43,7 @@ test('real app handlers: two independent DOM clients vote, hide, reveal, save, r
   h.$('story-title').value='FEE-42 — Een duidelijkere flow';h.submit('story-form');await settle();
   assert.equal(g.$('story-display').textContent,'FEE-42 — Een duidelijkere flow');
   h.vote('8');g.vote('3');await settle();
-  assert.match(h.$('vote-progress').textContent,/2 van 2/);
+  assert.match(h.$('vote-progress').textContent,/2 of 2/);
   assert.equal(h.w.document.querySelector('[data-vote="8"]').getAttribute('aria-pressed'),'true');
   assert.equal(g.$('participant-cards').textContent.includes('8'),false);
   const stateToGuest=net.packets.filter(p=>p.data.type==='state'&&p.to!==p.from).at(-1).data.view;
@@ -54,29 +54,29 @@ test('real app handlers: two independent DOM clients vote, hide, reveal, save, r
   assert.equal(h.$('results').hidden,true);
   h.click('reveal');await settle();assert.equal(g.$('results').hidden,false);
   assert.match(g.$('participant-cards').textContent,/8/);assert.match(g.$('participant-cards').textContent,/3/);
-  assert.match(h.$('result-summary').textContent,/5,5/);
+  assert.match(h.$('result-summary').textContent,/5\.5/);
   h.$('final-estimate').value='5';h.submit('save-result');await settle();assert.match(g.$('history').textContent,/FEE-42/);
-  h.click('next-round');await settle();assert.equal(g.$('results').hidden,true);assert.match(h.$('vote-progress').textContent,/0 van 2/);
-  guestPeer.links[0].send({type:'action',action:{type:'vote',round:1,value:'21'}});await settle();assert.match(h.$('vote-progress').textContent,/0 van 2/);
+  h.click('next-round');await settle();assert.match(g.$('timer').textContent,/2:00|1:59/);assert.equal(g.$('results').hidden,true);assert.match(h.$('vote-progress').textContent,/0 of 2/);
+  guestPeer.links[0].send({type:'action',action:{type:'vote',round:1,value:'21'}});await settle();assert.match(h.$('vote-progress').textContent,/0 of 2/);
 });
 
 test('spectator status, vote withdrawal, timer and reconnect keep UI and session consistent', async t=>{
   const net=network(),h=await hostPage(net),g=await guestPage(net,h);t.after(()=>{h.close();g.close();});
-  g.vote('5');await settle();g.vote('5');await settle();assert.match(h.$('vote-progress').textContent,/0 van 2/);
+  g.vote('5');await settle();g.vote('5');await settle();assert.match(h.$('vote-progress').textContent,/0 of 2/);
   g.$('spectator').checked=true;g.$('spectator').dispatchEvent(new g.w.Event('change'));await settle();
-  assert.match(h.$('vote-progress').textContent,/0 van 1/);assert.equal(g.w.document.querySelector('[data-vote="5"]').disabled,true);
-  h.click('timer-start');await settle();assert.match(g.$('timer').textContent,/2:00|1:59/);
+  assert.match(h.$('vote-progress').textContent,/0 of 1/);assert.equal(g.w.document.querySelector('[data-vote="5"]').disabled,true);
+  assert.match(g.$('timer').textContent,/2:00|1:59/); h.click('timer-start');await settle();assert.match(g.$('timer').textContent,/No timer/);
   const guestPeer=[...net.peers.values()].find(p=>!p.id.startsWith('rp-v1-'));guestPeer.links[0].close();await settle();
-  assert.equal(h.$('member-count').textContent,'1');assert.match(g.$('network-status').textContent,/verbroken/);
+  assert.equal(h.$('member-count').textContent,'1');assert.match(g.$('network-status').textContent,/Disconnected/);
   g.$('guest-wait').querySelector('button').click();await settle();
-  assert.equal(h.$('member-count').textContent,'2');assert.equal(g.$('network-status').textContent,'Verbonden');
+  assert.equal(h.$('member-count').textContent,'2');assert.equal(g.$('network-status').textContent,'Connected');
 });
 
 test('missing rooms and malformed codes show useful errors and re-enable entry controls', async t=>{
   const net=network(),p=page(net);t.after(()=>p.close());p.$('name').value='Collega';p.click('join-tab');p.$('room-code').value='bad';p.submit('entry-form');
-  assert.match(p.$('connection-message').textContent,/12 tekens/);
+  assert.match(p.$('connection-message').textContent,/12-character/);
   p.$('room-code').value='123456-ABCDEF';p.submit('entry-form');await settle();
-  assert.match(p.$('connection-message').textContent,/niet actief/);assert.equal(p.$('join-room').disabled,false);assert.equal(p.$('room').hidden,true);
+  assert.match(p.$('connection-message').textContent,/not active/);assert.equal(p.$('join-room').disabled,false);assert.equal(p.$('room').hidden,true);
 });
 
 test('signaling reconnect does not reset a running round', async t=>{
@@ -84,7 +84,7 @@ test('signaling reconnect does not reset a running round', async t=>{
   h.vote('8');await settle();
   const hostPeer=[...net.peers.values()].find(p=>p.id.startsWith('rp-v1-'));
   hostPeer.disconnected=true;hostPeer.emit('disconnected');await settle();
-  assert.equal(h.$('member-count').textContent,'2');assert.match(h.$('vote-progress').textContent,/1 van 2/);
+  assert.equal(h.$('member-count').textContent,'2');assert.match(h.$('vote-progress').textContent,/1 of 2/);
   assert.equal(h.w.document.querySelector('[data-vote="8"]').getAttribute('aria-pressed'),'true');
 });
 
@@ -100,7 +100,7 @@ test('host leaving disconnects guests and clears recoverable session', async t=>
   const net=network(),h=await hostPage(net),g=await guestPage(net,h);t.after(()=>{h.close();g.close();});
   h.click('leave-room');assert.equal(h.$('leave-dialog').open,true);h.click('leave-confirm');await settle();
   assert.equal(h.$('room').hidden,true);assert.equal(h.w.sessionStorage.getItem('rp-host'),null);
-  assert.match(g.$('network-status').textContent,/verbroken/);assert.equal(g.w.document.querySelector('[data-vote="5"]').disabled,true);
+  assert.match(g.$('network-status').textContent,/Disconnected/);assert.equal(g.w.document.querySelector('[data-vote="5"]').disabled,true);
 });
 
 test('Teams configuration sets a shared room and requires nonempty tab name', async t=>{
@@ -117,3 +117,10 @@ test('Teams configuration sets a shared room and requires nonempty tab name', as
   assert.equal(saved,true);assert.equal(configData.suggestedDisplayName,'Onze refinement');
   assert.match(configData.contentUrl,/#room=[A-F0-9]{12}&auto=1$/);assert.equal(configData.contentUrl,configData.websiteUrl);
 });
+
+ test('facilitator can restart voting with a fresh timer while preserving the topic', async t=>{
+ const net=network(),h=await hostPage(net),g=await guestPage(net,h);t.after(()=>{h.close();g.close();});
+ h.$('story-title').value='Keep this story';h.submit('story-form');h.vote('5');await settle();
+ assert.match(h.$('timer').textContent,/2:00|1:59/);assert.match(h.$('next-round').textContent,/Restart round/);assert.equal(g.$('next-round').hidden,true);
+ h.click('next-round');await settle();assert.match(g.$('vote-progress').textContent,/0 of 2/);assert.equal(g.$('story-display').textContent,'Keep this story');assert.match(g.$('timer').textContent,/2:00|1:59/);
+ });

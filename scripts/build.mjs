@@ -17,10 +17,10 @@ await writeFile('.nojekyll', ''); await writeFile('dist/.nojekyll', '');
 await mkdir('teams', { recursive: true });
 const manifest = {
   $schema: 'https://developer.microsoft.com/en-us/json-schemas/teams/v1.19/MicrosoftTeams.schema.json',
-  manifestVersion: '1.19', version: '1.0.0', id: '0c355514-f609-4c49-8c28-376736180e73',
+  manifestVersion: '1.19', version: '1.0.1', id: '0c355514-f609-4c49-8c28-376736180e73',
   developer: { name: 'Annemiek de Haan', websiteUrl: 'https://github.com/annemiekdehaan/refinement-poker', privacyUrl: base + 'privacy.html', termsOfUseUrl: base + 'privacy.html' },
-  name: { short: 'Refinement Poker', full: 'Refinement Poker — samen inschatten' },
-  description: { short: 'Samen stories inschatten met verborgen stemmen en gezamenlijk onthullen.', full: 'Start een refinement-sessie in je vergadering, chat of kanaal. Iedereen kiest onafhankelijk een kaart; de sessieleider onthult de stemmen tegelijk. Bespreek verschillen, bewaar afgesproken story points en exporteer resultaten als CSV. Geen account nodig. Maximaal 12 deelnemers; de sessieleider houdt de app open. Vereist een netwerk dat WebRTC toestaat.' },
+  name: { short: 'Refinement Poker', full: 'Refinement Poker — estimate together' },
+  description: { short: 'Estimate stories together with hidden votes and a shared reveal.', full: 'Start a refinement session in your meeting, chat or channel. Everyone chooses a card independently; the facilitator reveals the votes together. Discuss differences, save agreed story points and export results as CSV. No account needed. Up to 12 participants; the facilitator keeps the app open. Requires a network that allows WebRTC.' },
   icons: { outline: 'outline.png', color: 'color.png' }, accentColor: '#203B33',
   configurableTabs: [{ configurationUrl: base + 'config.html', canUpdateConfiguration: true, scopes: ['team', 'groupChat'], context: ['channelTab', 'privateChatTab', 'meetingChatTab', 'meetingDetailsTab', 'meetingSidePanel'] }],
   staticTabs: [{ entityId: 'refinement-poker-home', name: 'Poker', contentUrl: base, websiteUrl: base, scopes: ['personal'] }],

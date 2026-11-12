@@ -6,9 +6,9 @@ const url = new URL('./', location.href);
 url.hash = `room=${roomCode}&auto=1`;
 document.getElementById('browser-link').href = url.href;
 async function setup() {
-  if (window.parent === window) { status.textContent = 'In Teams sla je dit tabblad op met de knop Opslaan. Hier kun je de app direct in de browser openen.'; return; }
+  if (window.parent === window) { status.textContent = 'In Teams, save this tab with the Save button. Here you can open the app directly in your browser.'; return; }
   try {
-    await Promise.race([window.microsoftTeams.app.initialize(), new Promise((_, reject) => setTimeout(() => reject(new Error('Teams reageert niet.')), 6000))]);
+    await Promise.race([window.microsoftTeams.app.initialize(), new Promise((_, reject) => setTimeout(() => reject(new Error('Teams is not responding.')), 6000))]);
     const config = window.microsoftTeams.pages.config;
     const validate = () => config.setValidityState(!!cleanText(name.value, 40));
     name.addEventListener('input', validate);
@@ -16,11 +16,11 @@ async function setup() {
       try {
         await config.setConfig({ entityId: `refinement-poker-${roomCode}`, contentUrl: url.href, websiteUrl: url.href, suggestedDisplayName: cleanText(name.value, 40) || 'Refinement Poker' });
         saveEvent.notifySuccess();
-      } catch { saveEvent.notifyFailure('Opslaan is niet gelukt. Probeer het opnieuw.'); }
+      } catch { saveEvent.notifyFailure('Unable to save. Please try again.'); }
     });
     validate();
-    status.textContent = 'Klaar! Klik onderaan in Teams op Opslaan.';
+    status.textContent = 'Ready! Click Save at the bottom of the Teams dialog.';
     window.microsoftTeams.app.notifySuccess();
-  } catch { status.textContent = 'Geen verbinding met Teams. Open deze pagina via Een tabblad toevoegen in Teams, of gebruik de app in je browser.'; }
+  } catch { status.textContent = 'Unable to connect to Teams. Open this page through Add a tab in Teams, or use the app in your browser.'; }
 }
 setup();

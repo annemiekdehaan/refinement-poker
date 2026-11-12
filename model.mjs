@@ -64,7 +64,7 @@ export function act(room, actorId, action, now = Date.now()) {
       return true;
     case 'save': {
       if (!host || !room.revealed || room.saved || !DECK.includes(action.value)) return false;
-      room.history.unshift({ round: room.round, title: room.title || `Ronde ${room.round}`, estimate: action.value,
+      room.history.unshift({ round: room.round, title: room.title || `Round ${room.round}`, estimate: action.value,
         votes: room.members.filter(m => m.online && !m.spectator && m.vote !== null).map(m => ({ name: m.name, vote: m.vote })), at: new Date(now).toISOString() });
       room.history = room.history.slice(0, 100);
       room.saved = true;
@@ -95,6 +95,6 @@ export function historyCsv(history) {
     if (/^[=+@\-\t\r\n]/.test(text)) text = `'${text}`;
     return `"${text.replaceAll('"', '""')}"`;
   };
-  const rows = [['Ronde', 'Onderwerp', 'Story points', 'Stemmen', 'Datum'], ...history.map(h => [h.round, h.title, h.estimate, h.votes.map(v => `${v.name}: ${v.vote}`).join(' | '), h.at])];
+  const rows = [['Round', 'Topic', 'Story points', 'Votes', 'Date'], ...history.map(h => [h.round, h.title, h.estimate, h.votes.map(v => `${v.name}: ${v.vote}`).join(' | '), h.at])];
   return '\uFEFF' + rows.map(row => row.map(cell).join(';')).join('\r\n');
 }

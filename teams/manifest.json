@@ -1,7 +1,7 @@
 {
   "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.19/MicrosoftTeams.schema.json",
   "manifestVersion": "1.19",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "id": "0c355514-f609-4c49-8c28-376736180e73",
   "developer": {
     "name": "Annemiek de Haan",
@@ -11,11 +11,11 @@
   },
   "name": {
     "short": "Refinement Poker",
-    "full": "Refinement Poker — samen inschatten"
+    "full": "Refinement Poker — estimate together"
   },
   "description": {
-    "short": "Samen stories inschatten met verborgen stemmen en gezamenlijk onthullen.",
-    "full": "Start een refinement-sessie in je vergadering, chat of kanaal. Iedereen kiest onafhankelijk een kaart; de sessieleider onthult de stemmen tegelijk. Bespreek verschillen, bewaar afgesproken story points en exporteer resultaten als CSV. Geen account nodig. Maximaal 12 deelnemers; de sessieleider houdt de app open. Vereist een netwerk dat WebRTC toestaat."
+    "short": "Estimate stories together with hidden votes and a shared reveal.",
+    "full": "Start a refinement session in your meeting, chat or channel. Everyone chooses a card independently; the facilitator reveals the votes together. Discuss differences, save agreed story points and export results as CSV. No account needed. Up to 12 participants; the facilitator keeps the app open. Requires a network that allows WebRTC."
   },
   "icons": {
     "outline": "outline.png",

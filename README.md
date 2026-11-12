@@ -1,6 +1,6 @@
 # Refinement Poker ♠
 
-Nederlandse planning-pokerapp voor browser en Microsoft Teams. Start een kamer, deel de link, stem onafhankelijk en onthul samen. Gebouwd voor kleine teams, met maximaal 12 aangesloten deelnemers inclusief meekijkers.
+Engelstalige planning-pokerapp voor browser en Microsoft Teams. Start een kamer, deel de link, stem onafhankelijk en onthul samen. Gebouwd voor kleine teams, met maximaal 12 aangesloten deelnemers inclusief meekijkers.
 
 ## Gebruik
 
@@ -56,3 +56,7 @@ Officiële documentatie: [PeerJS](https://peerjs.com/client/getting-started), [P
 ## Licenties
 
 Eigen broncode: MIT, zie LICENSE. Bibliotheken: zie THIRD_PARTY_NOTICES.txt. `vendor/` bevat de officiële distributies zonder bronkaartverwijzingen. Het Teams-pakket bevat alleen manifest en iconen; geen geheime sleutels.
+
+## Versie 1.0.1
+
+De volledige app en Teams-configuratie zijn Engels. Bij starten loopt de timer meteen 2 minuten. De sessieleider kan tijdens stemmen **Restart round** kiezen (zelfde onderwerp, lege stemmen, nieuwe timer) en na onthullen **Next round** (nieuw onderwerp, lege stemmen, nieuwe timer). De timer onthult niet automatisch; de sessieleider gebruikt **Reveal cards**.
