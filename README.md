@@ -64,3 +64,7 @@ De volledige app en Teams-configuratie zijn Engels. Bij starten loopt de timer m
 ## Versie 1.0.2
 
 In een geconfigureerd Teams-tabblad: één Start-knop, geen naamformulier of zichtbare kamercode, automatische weergavenaam uit de Teams-context indien beschikbaar en een grote gezamenlijke timer. Als Teams geen naam levert, gebruikt de app een tijdelijke Participant-naam. Het tabblad bewaart dezelfde sessiekoppeling, ook na verlaten of verversen. De app leest niet de volledige kanaalledenlijst; alleen aangesloten deelnemers verschijnen aan tafel. In de losse webversie is een eigen naam optioneel.
+
+## Chatbot in voorbereiding
+
+De tabbladvariant blijft behouden. `bot/` bevat de geteste uitbreiding voor `/poker titel`, stemkaarten, resultaten en volgende rondes in de chat. De bot is nog niet geregistreerd of gehost; de huidige Teams-ZIP blijft de tabbladvariant. Zie [bot/README.md](bot/README.md) voor de concrete koppelstappen en testgrenzen. Na Microsoft-registratie genereert de pakketbouwer één ZIP met zowel tabblad als chatcommando.

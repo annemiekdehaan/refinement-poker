@@ -1,0 +1,42 @@
+openapi: 3.0.3
+info:
+  title: Teams Bot Connector subset used by Refinement Poker
+  version: 1.0.0
+  description: Contract subset derived from Microsoft Bot Connector REST documentation and installed Teams SDK 2.2.1. Simulation is synthetic, not tenant verification.
+servers:
+  - url: https://smba.trafficmanager.net/emea
+security:
+  - botBearer: []
+components:
+  securitySchemes:
+    botBearer: {type: http, scheme: bearer, bearerFormat: JWT}
+paths:
+  /v3/conversations/{conversationId}/activities:
+    post:
+      parameters:
+        - in: path
+          name: conversationId
+          required: true
+          schema: {type: string}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {type: object, required: [type, attachments], properties: {type: {type: string, enum: [message]}, attachments: {type: array, items: {type: object}}}}
+      responses:
+        '201': {description: Resource ID returned, content: {application/json: {schema: {type: object, properties: {id: {type: string}}}}}}
+        '503': {description: Service temporarily unavailable}
+  /v3/conversations/{conversationId}/activities/{activityId}:
+    put:
+      parameters:
+        - {in: path, name: conversationId, required: true, schema: {type: string}}
+        - {in: path, name: activityId, required: true, schema: {type: string}}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {type: object, required: [type, attachments]}
+      responses:
+        '200': {description: Updated resource ID returned}
+        '404': {description: Unknown activity}
+        '503': {description: Service temporarily unavailable}

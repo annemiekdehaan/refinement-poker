@@ -1,0 +1,21 @@
+{
+  "name": "refinement-poker-bot",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "start": "node --env-file-if-exists=.env server.mjs",
+    "test": "node --test tests/*.test.mjs"
+  },
+  "dependencies": {
+    "@microsoft/teams.apps": "2.2.1",
+    "express": "5.3.0",
+    "@microsoft/teams.api": "2.2.1"
+  },
+  "devDependencies": {
+    "@microsoft/teams.cli": "3.1.0"
+  }
+}

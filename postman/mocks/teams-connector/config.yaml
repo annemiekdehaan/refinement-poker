@@ -1,0 +1,11 @@
+version: 1
+name: teams-connector
+slug: teams-connector
+protocol: http
+port: 4500
+interceptRequests: true
+origin: smba.trafficmanager.net
+scenarios:
+  - name: default
+    path: ./server.cjs
+    default: true

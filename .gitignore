@@ -3,3 +3,8 @@ dist/
 .DS_Store
 test-results/
 *.zip
+.env
+.env.*
+!.env.example
+data/
+*.sqlite*

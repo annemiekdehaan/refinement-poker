@@ -1,0 +1,13 @@
+# Simulation scaffold. Add fault-injection scenarios under each mock, e.g.:
+#   scenarios:
+#     - overrides:
+#         conditions:
+#           latency: { delay_ms: 500 }
+# Then serve it with: postman simulation run <this file>
+
+simulation: poker-bot
+routing: path
+mocks:
+  - name: teams-connector
+    routeKey: teams
+    path: ../mocks/teams-connector/config.yaml

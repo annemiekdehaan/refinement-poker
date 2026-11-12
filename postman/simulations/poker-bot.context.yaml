@@ -1,0 +1,30 @@
+purpose:
+  stands_in_for: Microsoft Teams Bot Connector activity create/update endpoints
+  unblocks: Local bot engine and SDK HTTP tests without Microsoft credentials or sending real messages
+assumptions:
+  - id: sdk-http-contract
+    status: supported
+    claim: The installed Teams SDK sends POST and PUT activity payloads compatible with the documented Bot Connector subset.
+    reason: Actual SDK traffic matched the recorded route shape and state changes in the local simulation. This establishes caller behavior, not a live Microsoft integration.
+    verification: On 2026-11-12 ran connector-simulation.mjs against Postman CLI 1.73.0; observed create, hidden vote update, 503, recovered update, deadline reveal and next-round post with retained earlier results.
+    source: bot/tests/connector-simulation.mjs; postman/teams-connector.openapi.yaml; Microsoft Teams SDK 2.2.1
+    updated_at: '2026-11-12'
+  - id: live-tenant-and-slash-threading
+    status: unknown
+    claim: Slash commands and shared cards render and post correctly in the user's Microsoft 365 tenant.
+    reason: No registered Microsoft bot identity, hosted endpoint or live tenant installation exists yet. A synthetic connector cannot establish rendering or targeted-message routing.
+    verification: Official manifest 1.29 schema passed. Actual tenant installation remains required.
+    source: bot/tests/package.test.mjs; bot/README.md; https://microsoft.github.io/teams-sdk/typescript/essentials/on-activity/
+    updated_at: '2026-11-12'
+  - id: authentication-required
+    status: supported
+    claim: The production endpoint requires signed Microsoft service tokens for the configured tenant.
+    reason: Uses official SDK verification without any bypass. The Orbit example omitted auth and is insufficient for authentication guidance.
+    verification: Local HTTP tests returned 401 for missing and forged tokens and 403 for a wrong tenant. Positive Microsoft authentication remains unverified.
+    source: bot/app.mjs; bot/tests/engine.test.mjs
+    updated_at: '2026-11-12'
+fingerprints:
+  - id: first-local-bot-verification
+    date: '2026-11-12'
+    commit: null
+    cli: Postman 1.73.0; Teams CLI 3.1.0; Teams SDK 2.2.1

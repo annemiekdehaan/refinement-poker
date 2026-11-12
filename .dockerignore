@@ -1,0 +1,9 @@
+**/node_modules
+**/.env
+**/.env.*
+**/data
+**/*.sqlite*
+.git
+dist
+bot/package
+*.zip
